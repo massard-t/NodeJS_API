@@ -18,5 +18,5 @@ const connection = mysql.createConnection({
 });
 console.log("test");
 connection.connect();
-const result = GetSelectData(connection, "client");
+const result = GetSelectData(connection, "client", "id");
 connection.end();
