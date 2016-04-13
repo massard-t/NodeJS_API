@@ -15,13 +15,15 @@ function LoginIsConform(data_received) {
     const parsed_data = JSON.parse(data_received);
     if (parsed_data === 'undefined')
         return (false);
-    console.log(parsed_data);
     var concat = "(";
     for (var field in parsed_data)
     {
-        console.log(field + ' : ' +parsed_data[field]);
-        if (typeof(parsed_data[field]) == 'string') 
-            concat += `\`` + parsed_data[field] + `\`,`;
+        if (typeof(parsed_data[field]) == 'string') {
+            if (field == 'password' || field == 'email')
+                concat += `\`` + md5(parsed_data[field]) + `\`,`;
+            else
+                concat += `\`` + parsed_data[field] + `\`,`;
+        }
         else
             concat += parsed_data[field] + `,`;
     }
@@ -36,12 +38,15 @@ function AddData(connect, table, content) {
     connect.query(`INSERT INTO ${table} VALUES `);
 }
 
+
+const express    = require('express');
+const mysql      = require('mysql');
+const md5        = require('md5');
 const string_to_test = "{\"email\":\"bob@test.com\",\"password\":\"123456\", \"id\": 8}";
 console.log(string_to_test);
 LoginIsConform(string_to_test);
 
-const express    = require('express');
-const mysql      = require('mysql');
+
 const connection = mysql.createConnection({
   host     : '0.0.0.0',
   user     : 'node',
