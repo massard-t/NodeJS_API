@@ -1,18 +1,22 @@
-var mysql      = require('mysql');
-var connection = mysql.createConnection({
-  host     : 'localhost',
-  user     : '< MySQL username >',
-  password : '< MySQL password >',
-  database : '<your database name>'
+function GetSelectData(connect, table, content) {
+    content = content || '*';
+    connect.query(`SELECT ${content} from ${table}`, function(err, rows, fields) {
+      if (!err)
+        console.log('The solution is: ', rows);
+      else
+        console.log('Error while performing Query.');
+    });
+    return (connect);
+}
+
+const mysql      = require('mysql');
+const connection = mysql.createConnection({
+  host     : '0.0.0.0',
+  user     : 'node',
+  password : 'nodejs',
+  database : 'asptt'
 });
 console.log("test");
 connection.connect();
-
-connection.query('SELECT * from < table name >', function(err, rows, fields) {
-  if (!err)
-    console.log('The solution is: ', rows);
-  else
-    console.log('Error while performing Query.');
-});
-
+const result = GetSelectData(connection, "client");
 connection.end();
