@@ -13,21 +13,30 @@ function LoginIsConform(data_received) {
     if (!(data_received))
         return (false);
     const parsed_data = JSON.parse(data_received);
+    if (parsed_data === 'undefined')
+        return (false);
     console.log(parsed_data);
+    var concat = "(";
     for (var field in parsed_data)
     {
         console.log(field + ' : ' +parsed_data[field]);
+        if (typeof(parsed_data[field]) == 'string') 
+            concat += `\`` + parsed_data[field] + `\`,`;
+        else
+            concat += parsed_data[field] + `,`;
     }
+    concat = concat.slice(0, -1) + `)`;
+    console.log(concat);
 }
 
 function AddData(connect, table, content) {
     content = content || false;
     if (!content)
         return false;
-    connect.query(`INSERT INTO ${table} VALUE `);
+    connect.query(`INSERT INTO ${table} VALUES `);
 }
 
-const string_to_test = "{\"login\":\"bob\",\"password\":\"123456\", \"id\": 8}";
+const string_to_test = "{\"email\":\"bob@test.com\",\"password\":\"123456\", \"id\": 8}";
 console.log(string_to_test);
 LoginIsConform(string_to_test);
 
