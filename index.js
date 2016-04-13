@@ -12,12 +12,6 @@ function GetSelectData(connect, table, content) {
 function LoginIsConform(data_received) {
     if (!(data_received))
         return (false);
-    ExtractJSON(data_received, 1);
-    return; // !!
-    const parsed_data = JSON.parse(data_received);
-    return; // !!
-    if (parsed_data === 'undefined')
-        return (false);
     var concat = "(";
     for (var field in parsed_data)
     {
@@ -41,7 +35,6 @@ function LoginIsConform(data_received) {
 
 
 function ExtractJSON(content_json, fields) {
-    fields = fields || false;
     const parsed_data = JSON.parse(content_json);
     // console.log(parsed_data);
     if (parsed_data === 'undefined')
@@ -53,8 +46,13 @@ function ExtractJSON(content_json, fields) {
         {
             res_array.push(field);
         }
+    } else {
+            for (var field in parsed_data)
+            {
+                res_array.push(`'`+parsed_data[field]+`'`);
+            }
     }
-    console.log(res_array + "\nfin extractJSON");
+    console.log(res_array.join(`,`) + "\nfin extractJSON");
     return (res_array.join(`,`))
 }
 
@@ -65,7 +63,6 @@ function ExtractJSON(content_json, fields) {
 
 function AddData(connect, table, content) {
     content = content || false;
-    return true;
     if (!content)
         return false;
     const request = `INSERT INTO ${table} (${content[0]}) VALUES (${content[1]});`;
@@ -83,7 +80,7 @@ const express    = require('express');
 const mysql      = require('mysql');
 const md5        = require('md5');
 var string_to_test = "{\"email\":\"bob@test.com\", \"id\": 8,\"nom\":\"monsi";
-string_to_test += "eurtest\", \"password\":\"123456\",\"prenom\":\"pat\"}";
+string_to_test += "eurtest\", \"passwd\":\"123456\",\"prenom\":\"pat\"}";
 const connection = mysql.createConnection({
   host     : '0.0.0.0',
   user     : 'node',
@@ -92,14 +89,13 @@ const connection = mysql.createConnection({
 });
 
 //console.log(string_to_test);
-var test;
-if ((test = LoginIsConform(string_to_test)))
-{
-    if (AddData(connection, `coach`, test))
-        console.log("everything ok");
-    else
-        console.log("Failed");
-}
+
+
+const ee = [ExtractJSON(string_to_test, true),ExtractJSON(string_to_test, false)];
+if (AddData(connection, `coach`, ee))
+    console.log("everything ok");
+else
+    console.log("Failed");
 
 console.log("fin");
 connection.connect();
