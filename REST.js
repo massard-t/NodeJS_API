@@ -15,7 +15,7 @@ function ExtractJSON(content_json, fields) {
     } else {
             for (var field in parsed_data)
             {
-                res_array.push(`'`+parsed_data[field]+`'`);
+                if (field == 'id'){res_array.push(parsed_data[field]);}else{res_array.push(`'`+parsed_data[field]+`'`);}
             }
     }
     console.log(res_array.join(`,`) + "\nfin extractJSON");
@@ -45,9 +45,11 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
     router.post("/user", function(req, res){
         const bdd = DefineDB();
         console.log(req.headers.json);
-        const query = ExtractJSON(req.headers.json,true);
-        const table = ExtractJSON(req.headers.json, false);
-        const request = bdd.format(query, table);
+        const query = `INSERT INTO client (??) VALUES (?);`;
+        const values = [ExtractJSON(req.headers.json,true),
+                        ExtractJSON(req.headers.json,false)];
+        const request = bdd.format(query, values);
+        console.log(request);
         connection.query(request, function(err,rows){
             if(err) {
                 res.json({"Error" : true, "Message" : "Error executing MySQL query"});
