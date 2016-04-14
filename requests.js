@@ -101,6 +101,7 @@ function DefineDB() {
     connection.connect();
     return (connection);
 }
+
 function AddUser(req, res, next) {
     const requested_data = [ExtractJSON(req, true),ExtractJSON(req, false)];
     const connection = DefineDB();
