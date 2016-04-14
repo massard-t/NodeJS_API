@@ -1,9 +1,9 @@
-const express = require("express");
-const mysql = require("mysql");
-const bodyParser = require("body-parser");
-const md5 = require('md5');
-const rest = require("./REST.js");
-const app = express();
+var express = require("express");
+var mysql = require("mysql");
+var bodyParser = require("body-parser");
+var md5 = require('md5');
+var rest = require("./REST.js");
+var app = express();
 
 function REST(){
     const self = this;
@@ -40,8 +40,8 @@ REST.prototype.configureExpress = function(connection) {
 };
 
 REST.prototype.startServer = function() {
-      app.listen(3000,function(){
-          console.log("All right ! I am alive at Port 3000.");
+      app.listen(8081,function(){
+          console.log("All right ! I am alive at Port 8081.");
       });
 };
 
