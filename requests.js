@@ -34,27 +34,7 @@ function LoginIsConform(data_received) {
 
 
 
-function ExtractJSON(content_json, fields) {
-    const parsed_data = JSON.parse(content_json);
-    // console.log(parsed_data);
-    if (parsed_data === 'undefined')
-        return (false);
-    var res_array = [];
-    if (fields)
-    {
-        for (var field in parsed_data)
-        {
-            res_array.push(field);
-        }
-    } else {
-            for (var field in parsed_data)
-            {
-                res_array.push(`'`+parsed_data[field]+`'`);
-            }
-    }
-    console.log(res_array.join(`,`) + "\nfin extractJSON");
-    return (res_array.join(`,`));
-}
+
 
 
 
