@@ -41,10 +41,12 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
     router.get("/",function(req,res){
         res.json({"Message" : "Hello World !"});
     });
+
     router.post("/user", function(req, res){
         const bdd = DefineDB();
-        const query = ExtractJSON(req,true);
-        const table = ExtractJSON(req, false);
+        console.log(req.headers.json);
+        const query = ExtractJSON(req.headers.json,true);
+        const table = ExtractJSON(req.headers.json, false);
         const request = bdd.format(query, table);
         connection.query(request, function(err,rows){
             if(err) {
