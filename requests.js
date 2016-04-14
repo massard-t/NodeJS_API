@@ -53,7 +53,7 @@ function ExtractJSON(content_json, fields) {
             }
     }
     console.log(res_array.join(`,`) + "\nfin extractJSON");
-    return (res_array.join(`,`))
+    return (res_array.join(`,`));
 }
 
 
@@ -77,35 +77,55 @@ function AddData(connect, table, content) {
 }
 
 
-const express    = require('express');
+
 const mysql      = require('mysql');
 const md5        = require('md5');
-const id         = 10;
+/*const id         = 10;
 var string_to_test = `{\"email\":\"bob@test.com\", \"id\": ${id},\"nom\":\"monsi`;
-string_to_test += "eurtest\", \"passwd\":\"123456\",\"prenom\":\"pat\"}";
-const connection = mysql.createConnection({
-  host     : '0.0.0.0',
-  user     : 'robotbobtm',
-  database : 'asptt'
-});
+string_to_test += "eurtest\", \"passwd\":\"123456\",\"prenom\":\"pat\"}";*/
+
 
 //console.log(string_to_test);
 
-connection.connect();
-const ee = [ExtractJSON(string_to_test, true),ExtractJSON(string_to_test, false)];
+/*const ee = [ExtractJSON(string_to_test, true),ExtractJSON(string_to_test, false)];
 console.log(ee[0]);
 console.log(ee[1]);
+*/
 
-try {
-    if (AddData(connection, `coach`, ee))
-        console.log("everything ok");
-    else
-        console.log("Failed");
-} catch (e) {
-    console.log(`error ${e}`);
+function DefineDB() {
+    const connection = mysql.createConnection({
+        host     : '0.0.0.0',
+        user     : 'robotbobtm',
+        database : 'asptt'
+    });
+    connection.connect();
+    return (connection);
 }
-console.log("fin");
+function AddUser(req, res, next) {
+    const requested_data = [ExtractJSON(req, true),ExtractJSON(req, false)];
+    const connection = DefineDB();
+    try {
+        if (AddData(connection, `coach`, requested_data)) {
+            res.status(200).json({
+                status: "success",
+                message: "User added"
+            });
+            connection.end();
+        }
+        else
+            console.log("Failed");
+    } catch (e) {
+        connection.end();
+        res.status(100).json({
+            status: "error",
+            message: "Something went wrong"
+        });
+        console.log(`error ${e}`);
+    }
+    console.log("fin");
+}
 
 /*const result = GetSelectData(connection, "client", "id");
-const app = express();*/
+const app = express();
 connection.end();
+*/
