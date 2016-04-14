@@ -68,6 +68,7 @@ function AddData(connect, table, content) {
     const request = `INSERT INTO ${table} (${content[0]}) VALUES (${content[1]});`;
     console.log(request);
     connect.query(request, function(err, rows, fields) {
+        if (err) throw err;
       if (!err)
         console.log('The solution is: ', rows);
       else
@@ -79,26 +80,32 @@ function AddData(connect, table, content) {
 const express    = require('express');
 const mysql      = require('mysql');
 const md5        = require('md5');
-var string_to_test = "{\"email\":\"bob@test.com\", \"id\": 8,\"nom\":\"monsi";
+const id         = 10;
+var string_to_test = `{\"email\":\"bob@test.com\", \"id\": ${id},\"nom\":\"monsi`;
 string_to_test += "eurtest\", \"passwd\":\"123456\",\"prenom\":\"pat\"}";
 const connection = mysql.createConnection({
   host     : '0.0.0.0',
-  user     : 'node',
-  password : 'nodejs',
+  user     : 'robotbobtm',
   database : 'asptt'
 });
 
 //console.log(string_to_test);
 
-
-const ee = [ExtractJSON(string_to_test, true),ExtractJSON(string_to_test, false)];
-if (AddData(connection, `coach`, ee))
-    console.log("everything ok");
-else
-    console.log("Failed");
-
-console.log("fin");
 connection.connect();
+const ee = [ExtractJSON(string_to_test, true),ExtractJSON(string_to_test, false)];
+console.log(ee[0]);
+console.log(ee[1]);
+
+try {
+    if (AddData(connection, `coach`, ee))
+        console.log("everything ok");
+    else
+        console.log("Failed");
+} catch (e) {
+    console.log(`error ${e}`);
+}
+console.log("fin");
+
 /*const result = GetSelectData(connection, "client", "id");
 const app = express();*/
 connection.end();
