@@ -15,7 +15,8 @@ function ExtractJSON(content_json, fields) {
     } else {
             for (var field in parsed_data)
             {
-                if (field == 'id'){res_array.push(parsed_data[field]);}else{res_array.push(`'`+parsed_data[field]+`'`);}
+                if (field == 'id'){res_array.push(parsed_data[field]);}
+                else{res_array.push(`'`+parsed_data[field]+`'`);}
             }
     }
     console.log(res_array.join(`,`) + "\nfin extractJSON");
@@ -49,6 +50,10 @@ function UserExists(content) {
     return;
 }
 
+function ErrorJson(err)
+{
+    return (({"Error" : true, "Message" : `Error executing MySQL query: ${err}`}));
+}
 REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
     router.get("/",function(req,res){
         res.json({"Message" : "Hello World !"});
@@ -64,25 +69,28 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
         const request = bdd.format(query, values);
         console.log(request);
         connection.query(request, function(err,rows){
-            if(err) {
-                res.json({"Error" : true, "Message" : `Error executing MySQL query: ${err}`});
-            } else {
-                res.json({"Error" : false, "Message" : "User Added !"});
-            }
+            if(err) {res.json(ErrorJson(err));}
+            else {res.json({"Error" : false, "Message" : "User Added !"});}
         });
     });
     
     router.post("/connect", function(req, res){
         const bdd = DefineDB();
         console.log(req.headers.json);
-        const query = `SELECT id FROM client WHERE (email=? AND ID=?);`;
+        const query = `SELECT id FROM client WHERE (email=? and id=?);`;
         const values = [ExtractJSON(req.headers.json,true),
-                    ExtractJSON(req.headers.json,false)];
+                        ExtractJSON(req.headers.json,false)];
         // UserExists(req.headers.json);
         console.log(values);
         const request = bdd.format(query, values[1]);
         console.log(request);
-        res.json({"email":true});
+        connection.query(request, function(err, rows){
+            if (err){res.json(ErrorJson(err))} else {
+                const items = Object.keys(rows).length;
+                if (items == 1){res.json({"Error": false, "role":1})}
+                else{res.json({"Error":true, "Message": "Wrong email or password"})};
+            }
+        });
     });
     connection.release();
 };
