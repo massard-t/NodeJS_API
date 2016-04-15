@@ -77,7 +77,7 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
     router.post("/connect", function(req, res){
         const bdd = DefineDB();
         console.log(req.headers.json);
-        const query = `SELECT id FROM client WHERE (email=? and id=?);`;
+        const query = `SELECT * FROM users WHERE (email=? and password=?);`;
         const values = [ExtractJSON(req.headers.json,true),
                         ExtractJSON(req.headers.json,false)];
         // UserExists(req.headers.json);
@@ -85,14 +85,19 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
         const request = bdd.format(query, values[1]);
         console.log(request);
         connection.query(request, function(err, rows){
+            console.log("HEY");
+            console.log(values);
+            console.log("YEH");
             if (err){res.json(ErrorJson(err))} else {
                 const items = Object.keys(rows).length;
-                if (items == 1){res.json({"Error": false, "role":1})}
-                else{res.json({"Error":true, "Message": "Wrong email or password"})};
+                if (items > 1){res.json(ErrorJson(""));}
+                else if (items == 1){res.json({"Error": false, "role":1})}
+                else{res.json({"Error": true, "Message": "No such user"})}
             }
         });
     });
     connection.release();
 };
+
 
 module.exports = REST_ROUTER;
