@@ -1,4 +1,5 @@
 var mysql = require("mysql");
+var md5 = require("md5");
 
 function ExtractJSON(content_json, fields) {
     const parsed_data = JSON.parse(content_json);
@@ -16,6 +17,7 @@ function ExtractJSON(content_json, fields) {
             for (var field in parsed_data)
             {
                 if (field == 'id'){res_array.push(parsed_data[field]);}
+                else if (field =='password'){`'`+res_array.push(md5(parsed_data[field]))+`'`;}
                 else{res_array.push(`'`+parsed_data[field]+`'`);}
             }
     }
@@ -90,6 +92,7 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
             console.log("YEH");
             if (err){res.json(ErrorJson(err))} else {
                 const items = Object.keys(rows).length;
+                console.log(rows);
                 if (items > 1){res.json(ErrorJson(""));}
                 else if (items == 1){res.json({"Error": false, "role":1})}
                 else{res.json({"Error": true, "Message": "No such user"})}
