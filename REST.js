@@ -39,41 +39,52 @@ function REST_ROUTER(router,connection,md5) {
 
 function UserExists(content) {
     const bdd = DefineDB();
-    const query = `SELECT id FROM client WHERE (email=?? AND ID=??)`;
+    const query = `SELECT id FROM client WHERE (email=?? AND ID=??);`;
     const values = [ExtractJSON(content,true),
                     ExtractJSON(content,false)];
-    const request = bdd.format(query, values);
+    console.log(values[1]);
+    
+    const request = bdd.format(query, values[1]);
     console.log(request);
     return;
 }
+
 REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
-    const bdd = DefineDB();
     router.get("/",function(req,res){
         res.json({"Message" : "Hello World !"});
     });
 
-    router.post("/user", function(req, res, bdd){
+    router.post("/user", function(req, res){
         console.log(req.headers.json);
+        const bdd = DefineDB();
         const query = `INSERT INTO client (??) VALUES (?);`;
         const values = [ExtractJSON(req.headers.json,true),
                         ExtractJSON(req.headers.json,false)];
+        console.log(values);
         const request = bdd.format(query, values);
         console.log(request);
         connection.query(request, function(err,rows){
             if(err) {
-                res.json({"Error" : true, "Message" : "Error executing MySQL query"});
+                res.json({"Error" : true, "Message" : `Error executing MySQL query: ${err}`});
             } else {
                 res.json({"Error" : false, "Message" : "User Added !"});
-            };
+            }
         });
     });
     
-    router.post("/connect", function(req, res, bdd){
+    router.post("/connect", function(req, res){
+        const bdd = DefineDB();
         console.log(req.headers.json);
-        UserExists(req.headers.json);
+        const query = `SELECT id FROM client WHERE (email=? AND ID=?);`;
+        const values = [ExtractJSON(req.headers.json,true),
+                    ExtractJSON(req.headers.json,false)];
+        // UserExists(req.headers.json);
+        console.log(values);
+        const request = bdd.format(query, values[1]);
+        console.log(request);
         res.json({"email":true});
     });
-    connection.end();
-}
+    connection.release();
+};
 
 module.exports = REST_ROUTER;
