@@ -61,6 +61,25 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
         res.json({"Message" : "Hello World !"});
     });
 
+
+    router.post("/newrel", function(req, res){
+        const bdd = DefineDB();
+        console.log(req.body);
+        const values = [ExtractJSON(req.body.json,true),
+                        ExtractJSON(req.body.json,false)];
+        console.log(values);
+        console.log("before query");
+        const query = `INSERT INTO relations (??) VALUES (?);`;
+        const request = bdd.format(query, values);
+        console.log(request);
+        connection.query(request, function(err, rows){
+            if (err){res.json({"Error":true, "Message":"Probleme interne"})}
+            else {res.json({"Error":false, "Message":"Nouvelle relation"})}
+        });
+    });
+    
+    
+    
     router.post("/add", function(req, res){
         const bdd = DefineDB();
         console.log(req.body);
