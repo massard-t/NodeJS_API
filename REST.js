@@ -2,6 +2,7 @@ var mysql = require("mysql");
 var md5 = require("md5");
 
 function ExtractJSON(content_json, fields) {
+    console.log(content_json);
     const parsed_data = JSON.parse(content_json);
     // console.log(parsed_data);
     if (parsed_data === 'undefined')
@@ -17,7 +18,7 @@ function ExtractJSON(content_json, fields) {
             for (var field in parsed_data)
             {
                 if (field == 'id'){res_array.push(parsed_data[field]);}
-                else if (field =='password'){`'`+res_array.push(md5(parsed_data[field]))+`'`;}
+                else if (field =='mdp'){`'`+res_array.push(md5(parsed_data[field]))+`'`;}
                 else{res_array.push(`'`+parsed_data[field]+`'`);}
             }
     }
@@ -56,6 +57,7 @@ function ErrorJson(err)
 {
     return (({"Error" : true, "Message" : `Error executing MySQL query: ${err}`}));
 }
+
 REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
     router.get("/",function(req,res){
         res.json({"Message" : "Hello World !"});
@@ -78,10 +80,10 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
     
     router.post("/connect", function(req, res){
         const bdd = DefineDB();
-        console.log(req.headers.json);
+        console.log(req.body.json);
         const query = `SELECT * FROM users WHERE (email=? and password=?);`;
-        const values = [ExtractJSON(req.headers.json,true),
-                        ExtractJSON(req.headers.json,false)];
+        const values = [ExtractJSON(req.body.json,true),
+                        ExtractJSON(req.body.json,false)];
         // UserExists(req.headers.json);
         console.log(values);
         const request = bdd.format(query, values[1]);
@@ -93,8 +95,7 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
             if (err){res.json(ErrorJson(err))} else {
                 const items = Object.keys(rows).length;
                 console.log(rows);
-                if (items > 1){res.json(ErrorJson(""));}
-                else if (items == 1){res.json({"Error": false, "role":1})}
+                if (items >= 1){res.json({"Error": false, "role":1})}
                 else{res.json({"Error": true, "Message": "No such user"})}
             }
         });
