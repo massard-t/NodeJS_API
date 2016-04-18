@@ -2,7 +2,6 @@ var mysql = require("mysql");
 var md5 = require("md5");
 
 function ExtractJSON(content_json, fields) {
-    console.log(content_json);
     const parsed_data = JSON.parse(content_json);
     // console.log(parsed_data);
     if (parsed_data === 'undefined')
@@ -18,11 +17,10 @@ function ExtractJSON(content_json, fields) {
             for (var field in parsed_data)
             {
                 if (field == 'id'){res_array.push(parsed_data[field]);}
-                else if (field =='mdp'){`'`+res_array.push(md5(parsed_data[field]))+`'`;}
+                else if (field =='mdp' || field == 'password'){`'`+res_array.push(md5(parsed_data[field]))+`'`;}
                 else{res_array.push(`'`+parsed_data[field]+`'`);}
             }
     }
-    console.log(res_array.join(`,`) + "\nfin extractJSON");
     return (res_array);
 }
 
@@ -63,13 +61,18 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
         res.json({"Message" : "Hello World !"});
     });
 
-    router.post("/user", function(req, res){
-        console.log(req.headers.json);
+    router.post("/add", function(req, res){
         const bdd = DefineDB();
-        const query = `INSERT INTO client (??) VALUES (?);`;
-        const values = [ExtractJSON(req.headers.json,true),
-                        ExtractJSON(req.headers.json,false)];
-        console.log(values);
+        console.log(req.body);
+        const values = [ExtractJSON(req.body.json,true),
+                        ExtractJSON(req.body.json,false)];
+        const rolepos = values[0].indexOf('role');
+        console.log(values[0][rolepos] + " : " + values[1][rolepos]);
+        const table = (parseInt((values[1][rolepos]).replace('\'', '')) == 1) ? 'coach' : 'client';
+        console.log(`ParseInt: ${values[1][rolepos]}\nTable: ${table}`);
+        const query = `INSERT INTO ${table} (??) VALUES (?);`;
+        values[0].pop(rolepos);
+        values[1].pop(rolepos);
         const request = bdd.format(query, values);
         console.log(request);
         connection.query(request, function(err,rows){
@@ -80,23 +83,17 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
     
     router.post("/connect", function(req, res){
         const bdd = DefineDB();
-        console.log(req.body.json);
         const query = `SELECT * FROM users WHERE (email=? and password=?);`;
         const values = [ExtractJSON(req.body.json,true),
                         ExtractJSON(req.body.json,false)];
         // UserExists(req.headers.json);
-        console.log(values);
         const request = bdd.format(query, values[1]);
-        console.log(request);
         connection.query(request, function(err, rows){
-            console.log("HEY");
-            console.log(values);
-            console.log("YEH");
             if (err){res.json(ErrorJson(err))} else {
                 const items = Object.keys(rows).length;
                 console.log(rows);
-                if (items >= 1){res.json({"Error": false, "role":1})}
-                else{res.json({"Error": true, "Message": "No such user"})}
+                if (items >= 1){res.json({"Error": false,"role":rows[0].role})}
+                else{res.json({"Error": true, "Message": "No such user", "role":-1})}
             }
         });
     });
