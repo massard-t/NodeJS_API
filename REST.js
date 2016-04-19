@@ -186,27 +186,32 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
     
     router.post("/print_planning", function(req, res) {
         const bdd = DefineDB();
+        console.log(req.body);
         const query = `SELECT * FROM planning WHERE (client=?);`;
         const values = [ExtractJSON(req.body.json, true),
                         ExtractJSON(req.body.json, false)];
+        console.log(values);
         const request = bdd.format(query, values[1]);
         console.log(request);
         connection.query(request, function(err, rows){
-            if (err){res.json({"Error":true, "clients":-1})}
+            if (err){console.log("ECHEC\n\n\n\n");res.json({"Error":true, "clients":-1})}
             else{
-                const count = 0;
+                var count = 0;
                 const size = rows.length;
                 const planning = [];
+                console.log(`${size} << size`);
                 while (count < size) {
-                    const row_ = {
+                    var row_ = {
                         date : rows[count].date,
                         heure : rows[count].heure,
                         temps : rows[count].temps,
                         coach : rows[count].coach
                     };
+                    console.log(count);
                     planning.push(row_);
                     count++;
                 }
+                console.log(planning);
                 res.json({"Error":false, "content":planning});
             }
         });
