@@ -79,6 +79,22 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
     });
     
     
+    router.post("/reponseQuestion", function(req, res){
+        const bdd = DefineDB();
+        console.log(req.body);
+        const values = [ExtractJSON(req.body.json, true),
+                        ExtractJSON(req.body.json, false)];
+        console.log(values);
+        console.log("before query");
+        const query = `INSERT INTO question (??) VALUES (?);`;
+        const request = bdd.format(query, values);
+        console.log(request);
+        connection.query(request, function(err, rows){
+            if (err){res.json({"Error":true, "Message": "Probleme interne"})}
+            else {res.json({"Error":false, "Message": "Reponse à cette question ajoutée."})}
+        });
+    });
+    
     
     router.post("/add", function(req, res){
         const bdd = DefineDB();
@@ -125,6 +141,50 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
         });
     });
     
+    router.post("/getmyclients", function(req, res) {
+        const bdd = DefineDB();
+        const query = `SELECT client FROM relations WHERE (coach=?);`;
+        const values = [ExtractJSON(req.body.json, true),
+                        ExtractJSON(req.body.json, false)];
+        const request = bdd.format(query, values[1]);
+        console.log(request);
+        connection.query(request, function(err, rows){
+            if (err){res.json({"Error":true, "clients":-1})}
+            else{
+                console.log(rows);
+                var clients_id = [];
+                for (var row in rows) {
+                    clients_id.push(rows[row]);
+                }
+                res.json({"Error":false, "clients":clients_id})}
+        });
+    });
+    
+    router.post("/getclientinfo", function(req, res) {
+        const bdd = DefineDB();
+        const query = `SELECT * FROM client WHERE (email=?);`;
+        const values = [ExtractJSON(req.body.json, true),
+                        ExtractJSON(req.body.json, false)];
+        const request = bdd.format(query, values[1]);
+        console.log(request);
+        connection.query(request, function(err, rows) {
+            if (err){res.json({"Error":true})}
+            else{
+                var client_info = [];
+                console.log(rows[0]);
+                const row = rows[0];
+                res.json({"email":row.email, "nom":row.nom, "prenom":row.prenom,"phone":row.phone,"taille":row.taille,"poids":row.poids});
+                for (var element in rows[0]){
+                    client_info[element] = rows[0].element;
+                    console.log(element);
+                }
+                console.log(client_info);
+            }
+        });
+    });
+    
+    
+    
     router.post("/planning", function(req, res){
         const bdd = DefineDB();
         const query = `INSERT INTO planning (??) VALUES (?);`;
@@ -133,7 +193,10 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
         // UserExists(req.headers.json);
         const request = bdd.format(query, values);
         console.log(request);
-        res.json({"Error":true});
+        connection.query((request, function(err, rows){
+            if (err){res.json({"Error":true, "Message":"Probleme interne"})}
+            else(res.json({"Error":false}));
+        }));
     });
     
     connection.release();
