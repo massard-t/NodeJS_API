@@ -81,11 +81,9 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
     
     router.post("/reponseQuestion", function(req, res){
         const bdd = DefineDB();
-        console.log(req.body);
         const values = [ExtractJSON(req.body.json, true),
                         ExtractJSON(req.body.json, false)];
         console.log(values);
-        console.log("before query");
         const query = `INSERT INTO question (??) VALUES (?);`;
         const request = bdd.format(query, values);
         console.log(request);
@@ -98,7 +96,6 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
     
     router.post("/add", function(req, res){
         const bdd = DefineDB();
-        console.log(req.body);
         console.log(req.body.json);
         var table;
         const values = [ExtractJSON(req.body.json,true),
@@ -108,7 +105,8 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
         console.log("CONTENT: ");
         console.log((values[1][rolepos]));
         if ((values[1][rolepos]) !== undefined){
-            table = (parseInt((values[1][rolepos]).replace('\'', ''), 10) == 1) ? 'coach' : 'client';
+            table = (parseInt((values[1][rolepos]).replace('\'', ''),
+                                                10) == 1) ? 'coach' : 'client';
             values[0].pop(rolepos);
             values[1].pop(rolepos);
         } else {
@@ -129,7 +127,6 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
         const query = `SELECT * FROM users WHERE (email=? and password=?);`;
         const values = [ExtractJSON(req.body.json,true),
                         ExtractJSON(req.body.json,false)];
-        // UserExists(req.headers.json);
         const request = bdd.format(query, values[1]);
         connection.query(request, function(err, rows){
             if (err){res.json(ErrorJson(err))} else {
@@ -151,7 +148,6 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
         connection.query(request, function(err, rows){
             if (err){res.json({"Error":true, "clients":-1})}
             else{
-                console.log(rows);
                 var clients_id = [];
                 for (var row in rows) {
                     clients_id.push(rows[row]);
@@ -183,8 +179,6 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
         });
     });
     
-    
-    
     router.post("/planning", function(req, res){
         const bdd = DefineDB();
         const query = `INSERT INTO planning (??) VALUES (?);`;
@@ -196,6 +190,34 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
         connection.query(request, function(err, rows){
             if (err){res.json({"Error":true, "Message":"Probleme interne"})}
             else(res.json({"Error":false}));
+        });
+    });
+    
+    router.post("/print_planning", function(req, res) {
+        const bdd = DefineDB();
+        const query = `SELECT * FROM planning WHERE (client=?);`;
+        const values = [ExtractJSON(req.body.json, true),
+                        ExtractJSON(req.body.json, false)];
+        const request = bdd.format(query, values[1]);
+        console.log(request);
+        connection.query(request, function(err, rows){
+            if (err){res.json({"Error":true, "clients":-1})}
+            else{
+                const count = 0;
+                const size = rows.length;
+                const planning = [];
+                while (count < size) {
+                    const row_ = {
+                        date : rows[count].date,
+                        heure : rows[count].heure,
+                        temps : rows[count].temps,
+                        coach : rows[count].coach
+                    };
+                    planning.push(row_);
+                    count++;
+                }
+                res.json({"Error":false, "content":planning});
+            }
         });
     });
     
