@@ -193,10 +193,10 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
         // UserExists(req.headers.json);
         const request = bdd.format(query, values);
         console.log(request);
-        connection.query((request, function(err, rows){
+        connection.query(request, function(err, rows){
             if (err){res.json({"Error":true, "Message":"Probleme interne"})}
             else(res.json({"Error":false}));
-        }));
+        });
     });
     
     connection.release();
