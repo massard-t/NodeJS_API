@@ -64,11 +64,8 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
 
     router.post("/newrel", function(req, res){
         const bdd = DefineDB();
-        console.log(req.body);
         const values = [ExtractJSON(req.body.json,true),
                         ExtractJSON(req.body.json,false)];
-        console.log(values);
-        console.log("before query");
         const query = `INSERT INTO relations (??) VALUES (?);`;
         const request = bdd.format(query, values);
         console.log(request);
@@ -83,7 +80,6 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
         const bdd = DefineDB();
         const values = [ExtractJSON(req.body.json, true),
                         ExtractJSON(req.body.json, false)];
-        console.log(values);
         const query = `INSERT INTO question (??) VALUES (?);`;
         const request = bdd.format(query, values);
         console.log(request);
@@ -96,14 +92,10 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
     
     router.post("/add", function(req, res){
         const bdd = DefineDB();
-        console.log(req.body.json);
         var table;
         const values = [ExtractJSON(req.body.json,true),
                         ExtractJSON(req.body.json,false)];
         const rolepos = values[0].indexOf('role');
-        console.log(values[0][rolepos] + " : " + values[1][rolepos]);
-        console.log("CONTENT: ");
-        console.log((values[1][rolepos]));
         if ((values[1][rolepos]) !== undefined){
             table = (parseInt((values[1][rolepos]).replace('\'', ''),
                                                 10) == 1) ? 'coach' : 'client';
@@ -112,7 +104,6 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
         } else {
             table = 'client';
         }
-        console.log(`ParseInt: ${values[1][rolepos]}\nTable: ${table}`);
         const query = `INSERT INTO ${table} (??, new) VALUES (?, 0);`;
         const request = bdd.format(query, values);
         console.log(request);
