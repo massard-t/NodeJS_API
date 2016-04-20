@@ -3,7 +3,6 @@ var md5 = require("md5");
 
 function ExtractJSON(content_json, fields) {
     const parsed_data = JSON.parse(content_json);
-    // console.log(parsed_data);
     if (parsed_data === 'undefined')
         return (false);
     var res_array = [];
@@ -32,6 +31,18 @@ function DefineDB() {
     });
     connection.connect();
     return (connection);
+}
+
+function Foreach_Add(js_obj, query) {
+    const bdd = DefineDB();
+    const values = js_obj;
+    const request = bdd.format(query, values);
+    console.log(request);
+    bdd.query(request, function(err, rows){
+        if (err){throw err}
+        else {console.log("worked fine")}
+    });
+    bdd.end();
 }
 
 function REST_ROUTER(router,connection,md5) {
@@ -80,13 +91,27 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
         const bdd = DefineDB();
         const values = [ExtractJSON(req.body.json, true),
                         ExtractJSON(req.body.json, false)];
-        const query = `INSERT INTO question (??) VALUES (?);`;
-        const request = bdd.format(query, values);
-        console.log(request);
-        connection.query(request, function(err, rows){
-            if (err){res.json({"Error":true, "Message": "Probleme interne"})}
-            else {res.json({"Error":false, "Message": "Reponse à cette question ajoutée."})}
-        });
+        const email = values[1][values[0].indexOf('email')];
+        values[1].pop(values[0].indexOf('email'));
+        values[0].pop(values[0].indexOf('email'));
+        const query = `INSERT INTO question (client, numero, reponse) VALUES (${email}, ?, ?);`;
+        var count = 0;
+        const size = values[1].length;
+        var error = false;
+        try {
+            while (count < size) {
+            console.log(`Passage ${count}`);
+            Foreach_Add([values[0][count],values[1][count]], query);
+            count = count + 1;
+            }
+        } catch (err) {
+            res.json({"Error":true,"Message":err});
+            error = true;
+        }
+        console.log(values);
+        if (!error){
+            res.json({"Error":false,"Message":"Ajout reponses ok"});
+        }
     });
     
     
@@ -163,7 +188,6 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
                 res.json({"email":row.email, "nom":row.nom, "prenom":row.prenom,"phone":row.phone,"taille":row.taille,"poids":row.poids});
                 for (var element in rows[0]){
                     client_info[element] = rows[0].element;
-                    console.log(element);
                 }
                 console.log(client_info);
             }
@@ -175,7 +199,6 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
         const query = `INSERT INTO planning (??) VALUES (?);`;
         const values = [ExtractJSON(req.body.json,true),
                         ExtractJSON(req.body.json,false)];
-        // UserExists(req.headers.json);
         const request = bdd.format(query, values);
         console.log(request);
         connection.query(request, function(err, rows){
@@ -186,20 +209,17 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
     
     router.post("/print_planning", function(req, res) {
         const bdd = DefineDB();
-        console.log(req.body);
         const query = `SELECT * FROM planning WHERE (client=?);`;
         const values = [ExtractJSON(req.body.json, true),
                         ExtractJSON(req.body.json, false)];
-        console.log(values);
         const request = bdd.format(query, values[1]);
         console.log(request);
         connection.query(request, function(err, rows){
-            if (err){console.log("ECHEC\n\n\n\n");res.json({"Error":true, "clients":-1})}
+            if (err){res.json({"Error":true, "clients":-1})}
             else{
                 var count = 0;
                 const size = rows.length;
-                const planning = [];
-                console.log(`${size} << size`);
+                const planning = {}
                 while (count < size) {
                     var row_ = {
                         date : rows[count].date,
@@ -207,11 +227,9 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
                         temps : rows[count].temps,
                         coach : rows[count].coach
                     };
-                    console.log(count);
-                    planning.push(row_);
+                    planning[count] = row_;
                     count++;
                 }
-                console.log(planning);
                 res.json({"Error":false, "content":planning});
             }
         });
