@@ -48,7 +48,7 @@ REST.prototype.startServer = function() {
 };
 
 REST.prototype.stop = function(err) {
-    console.log("ISSUE WITH MYSQL n" + err);
+    console.log("ISSUE WITH MYSQL n\n" + err);
     process.exit(1);
 };
 

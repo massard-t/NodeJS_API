@@ -220,16 +220,16 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
                 const size = rows.length;
                 const planning = {};
                 while (count < size) {
-                    var row_ = {
-                        date : rows[count].date,
-                        heure : rows[count].heure,
-                        temps : rows[count].temps,
-                        coach : rows[count].coach
-                    };
+                    var row_ = [
+                        rows[count].date,
+                        rows[count].heure,
+                        rows[count].temps,
+                        rows[count].coach
+                    ];
                     planning[count] = row_;
                     count++;
                 }
-                res.json({"Error":false, "content":planning});
+                res.json(planning);
             }
         });
     });
