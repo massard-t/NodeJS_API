@@ -88,7 +88,6 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
     
     
     router.post("/reponseQuestion", function(req, res){
-        const bdd = DefineDB();
         const values = [ExtractJSON(req.body.json, true),
                         ExtractJSON(req.body.json, false)];
         const email = values[1][values[0].indexOf('email')];
@@ -219,7 +218,7 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
             else{
                 var count = 0;
                 const size = rows.length;
-                const planning = {}
+                const planning = {};
                 while (count < size) {
                     var row_ = {
                         date : rows[count].date,
