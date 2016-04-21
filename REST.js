@@ -204,16 +204,28 @@ REST_ROUTER.prototype.handleRoutes = function(router,connection,md5) {
                                       values[1][values[0].indexOf('email')]]);
                     console.log(requ_rel);
                     connection.query(requ_rel, function(err, rows) {
-                        if (err){res.json({"Error":true, "Message":err});}
-                        else{res.json({"Error":false});}
-                        });
-                    } else{
-                        console.log("USER");
-                        res.json({"Error" : false, "Message" : "User Added !"});}
-                    }
+                        if (err){
+                            res.json({
+                                "Error":true,
+                                "Message":err
+                            });
+                        }
+                        else{
+                            res.json({
+                                "Error":false,
+                                "Message":"Not a single error"
+                            });
+                        }
+                    });
+                } else{
+                    res.json({
+                        "Error" : false,
+                        "Message" : "User Added !"
+                    });
+                }
+            }
         });
-        console.log(values[0]);
-        });
+    });
 
 
     router.post("/connect", function(req, res){
