@@ -322,7 +322,14 @@ REST_ROUTER.prototype.handleRoutes = function(router,connection,md5) {
                 var client_info = [];
                 console.log(rows[0]);
                 const row = rows[0];
-                res.json({"email":row.email, "nom":row.nom, "prenom":row.prenom,"phone":row.phone,"taille":row.taille,"poids":row.poids});
+                res.json({
+                    "email":row.email,
+                    "nom":row.nom,
+                    "prenom":row.prenom,
+                    "phone":row.phone,
+                    "taille":row.taille,
+                    "poids":row.poids
+                });
                 for (var element in rows[0]){
                     client_info[element] = rows[0].element;
                 }
