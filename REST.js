@@ -82,7 +82,6 @@ REST_ROUTER.prototype.handleRoutes = function(router,connection,md5) {
         });
     });
 
-
     router.post("/newrel", function(req, res){
         const bdd = DefineDB();
         const values = [ExtractJSON(req.body.json,true),
@@ -95,7 +94,7 @@ REST_ROUTER.prototype.handleRoutes = function(router,connection,md5) {
                 res.json({
                     "Error":true,
                     "Message":"Probleme interne"
-                    });
+                });
             }
             else {
                 res.json({
@@ -105,7 +104,6 @@ REST_ROUTER.prototype.handleRoutes = function(router,connection,md5) {
             }
         });
     });
-    
     
     router.post("/info_coach", function(req, res){
         const bdd = DefineDB();
@@ -120,7 +118,7 @@ REST_ROUTER.prototype.handleRoutes = function(router,connection,md5) {
                 res.json({
                     "Error":true,
                     "Message":err
-                    });
+                });
             }
             else{
                 nb_clients = rows.length;
@@ -131,7 +129,7 @@ REST_ROUTER.prototype.handleRoutes = function(router,connection,md5) {
                         res.json({
                             "Error":true,
                             "Message":err
-                            });
+                        });
                     }
                    else{
                        res.json({
@@ -143,7 +141,6 @@ REST_ROUTER.prototype.handleRoutes = function(router,connection,md5) {
             }
         });
     });
-    
     
     router.post("/reponseQuestion", function(req, res){
         const values = [ExtractJSON(req.body.json, true),
@@ -163,20 +160,19 @@ REST_ROUTER.prototype.handleRoutes = function(router,connection,md5) {
             }
         } catch (err) {
             res.json({
-                    "Error":true,
-                    "Message":err
-                    });
+                "Error":true,
+                "Message":err
+                });
             error = true;
         }
         console.log(values);
         if (!error){
             res.json({
-                    "Error":false,
-                    "Message":"Ajout reponses ok"
-                    });
+                "Error":false,
+                "Message":"Ajout reponses ok"
+                });
         }
     });
-    
     
     router.post("/add", function(req, res){
         const bdd = DefineDB();
