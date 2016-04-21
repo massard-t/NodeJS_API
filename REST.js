@@ -1,6 +1,7 @@
 var mysql = require("mysql");
 var md5 = require("md5");
 
+
 function ExtractJSON(content_json, fields) {
     const parsed_data = JSON.parse(content_json);
     if (parsed_data === 'undefined')
@@ -41,7 +42,7 @@ function Foreach_Add(js_obj, query) {
     const values = js_obj;
     const request = bdd.format(query, values);
     console.log(request);
-    bdd.query(request, function(err, rows){
+    bdd.query(request, function(err, rows) {
         if (err){
             throw err;
         }
@@ -62,34 +63,34 @@ function UserExists(content) {
     const query = `SELECT id FROM client WHERE (email=?? AND ID=??);`;
     const values = [ExtractJSON(content,true),
                     ExtractJSON(content,false)];
-    console.log(values[1]);
-    
     const request = bdd.format(query, values[1]);
     console.log(request);
     return;
 }
 
-function ErrorJson(err)
-{
-    return (({"Error" : true, "Message" : `Error executing MySQL query: ${err}`}));
+function ErrorJson(err) {
+    return ({
+        "Error":true,
+        "Message":`Error executing MySQL query: ${err}`
+    });
 }
 
 REST_ROUTER.prototype.handleRoutes = function(router,connection,md5) {
-    router.get("/",function(req,res){
+    router.get("/",function(req,res) {
         res.json({
             "Error":false,
             "Message" : "API ASPTT Online"
         });
     });
 
-    router.post("/newrel", function(req, res){
+    router.post("/newrel", function(req, res) {
         const bdd = DefineDB();
         const values = [ExtractJSON(req.body.json,true),
                         ExtractJSON(req.body.json,false)];
         const query = `INSERT INTO relations (??) VALUES (?);`;
         const request = bdd.format(query, values);
         console.log(request);
-        connection.query(request, function(err, rows){
+        connection.query(request, function(err, rows) {
             if (err){
                 res.json({
                     "Error":true,
@@ -105,7 +106,7 @@ REST_ROUTER.prototype.handleRoutes = function(router,connection,md5) {
         });
     });
     
-    router.post("/info_coach", function(req, res){
+    router.post("/info_coach", function(req, res) {
         const bdd = DefineDB();
         const values = [ExtractJSON(req.body.json, true),
                         ExtractJSON(req.body.json, false)];
@@ -142,7 +143,7 @@ REST_ROUTER.prototype.handleRoutes = function(router,connection,md5) {
         });
     });
     
-    router.post("/reponseQuestion", function(req, res){
+    router.post("/reponseQuestion", function(req, res) {
         const values = [ExtractJSON(req.body.json, true),
                         ExtractJSON(req.body.json, false)];
         const email = values[1][values[0].indexOf('email')];
@@ -174,7 +175,7 @@ REST_ROUTER.prototype.handleRoutes = function(router,connection,md5) {
         }
     });
     
-    router.post("/add", function(req, res){
+    router.post("/add", function(req, res) {
         const bdd = DefineDB();
         var table;
         console.log(req.body.json);
