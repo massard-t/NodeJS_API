@@ -76,7 +76,10 @@ function ErrorJson(err)
 
 REST_ROUTER.prototype.handleRoutes = function(router,connection,md5) {
     router.get("/",function(req,res){
-        res.json({"Message" : "API ASPTT Online"});
+        res.json({
+            "Error":false,
+            "Message" : "API ASPTT Online"
+        });
     });
 
 
@@ -126,9 +129,9 @@ REST_ROUTER.prototype.handleRoutes = function(router,connection,md5) {
                 connection.query(req_planning, function(err, rows) {
                     if (err){
                         res.json({
-                                "Error":true,
-                                "Message":err
-                                });
+                            "Error":true,
+                            "Message":err
+                            });
                     }
                    else{
                        res.json({
@@ -136,7 +139,7 @@ REST_ROUTER.prototype.handleRoutes = function(router,connection,md5) {
                            "seances":rows.length
                        });
                    }
-            });
+                });
             }
         });
     });
