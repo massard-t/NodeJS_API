@@ -6,18 +6,21 @@ function ExtractJSON(content_json, fields) {
     if (parsed_data === 'undefined')
         return (false);
     var res_array = [];
-    if (fields)
-    {
-        for (var field in parsed_data)
-        {
+    if (fields){
+        for (var field in parsed_data){
             res_array.push(field);
         }
-    } else {
-            for (var field in parsed_data)
-            {
-                if (field == 'id'){res_array.push(parsed_data[field]);}
-                else if (field =='mdp' || field == 'password'){`'`+res_array.push(md5(parsed_data[field]))+`'`;}
-                else{res_array.push(`'`+parsed_data[field]+`'`);}
+    } else{
+            for (var field in parsed_data){
+                if (field == 'id'){
+                    res_array.push(parsed_data[field]);
+                }
+                else if (field =='mdp' || field == 'password'){
+                    `'`+res_array.push(md5(parsed_data[field]))+`'`;
+                }
+                else{
+                    res_array.push(parsed_data[field]);
+                }
             }
     }
     return (res_array);
@@ -39,8 +42,12 @@ function Foreach_Add(js_obj, query) {
     const request = bdd.format(query, values);
     console.log(request);
     bdd.query(request, function(err, rows){
-        if (err){throw err}
-        else {console.log("worked fine")}
+        if (err){
+            throw err;
+        }
+        else {
+            console.log("Not a single error");
+        }
     });
     bdd.end();
 }
@@ -67,9 +74,9 @@ function ErrorJson(err)
     return (({"Error" : true, "Message" : `Error executing MySQL query: ${err}`}));
 }
 
-REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
+REST_ROUTER.prototype.handleRoutes = function(router,connection,md5) {
     router.get("/",function(req,res){
-        res.json({"Message" : "Hello World !"});
+        res.json({"Message" : "API ASPTT Online"});
     });
 
 
@@ -81,8 +88,18 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
         const request = bdd.format(query, values);
         console.log(request);
         connection.query(request, function(err, rows){
-            if (err){res.json({"Error":true, "Message":"Probleme interne"})}
-            else {res.json({"Error":false, "Message":"Nouvelle relation"})}
+            if (err){
+                res.json({
+                    "Error":true,
+                    "Message":"Probleme interne"
+                    });
+            }
+            else {
+                res.json({
+                    "Error":false,
+                    "Message":"Nouvelle relation"
+                });
+            }
         });
     });
     
@@ -96,14 +113,29 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
         const req_clients = bdd.format(query_clients, values[1]);
         console.log(req_clients);
         connection.query(req_clients, function(err, rows) {
-            if (err){res.json({"Error":true, "Message":err});}
+            if (err){
+                res.json({
+                    "Error":true,
+                    "Message":err
+                    });
+            }
             else{
                 nb_clients = rows.length;
                 const query_planning = `SELECT * FROM planning WHERE (coach=?);`;
                 const req_planning = bdd.format(query_planning, values[1]);
                 connection.query(req_planning, function(err, rows) {
-                    if (err){res.json({"Error":true, "Message":err})}
-                   else{res.json({"clients":nb_clients, "seances":rows.length})}
+                    if (err){
+                        res.json({
+                                "Error":true,
+                                "Message":err
+                                });
+                    }
+                   else{
+                       res.json({
+                           "clients":nb_clients,
+                           "seances":rows.length
+                       });
+                   }
             });
             }
         });
@@ -122,17 +154,23 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
         var error = false;
         try {
             while (count < size) {
-            console.log(`Passage ${count}`);
-            Foreach_Add([values[0][count],values[1][count]], query);
-            count = count + 1;
+                console.log(`Passage ${count}`);
+                Foreach_Add([values[0][count],values[1][count]], query);
+                count = count + 1;
             }
         } catch (err) {
-            res.json({"Error":true,"Message":err});
+            res.json({
+                    "Error":true,
+                    "Message":err
+                    });
             error = true;
         }
         console.log(values);
         if (!error){
-            res.json({"Error":false,"Message":"Ajout reponses ok"});
+            res.json({
+                    "Error":false,
+                    "Message":"Ajout reponses ok"
+                    });
         }
     });
     
@@ -140,6 +178,7 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
     router.post("/add", function(req, res){
         const bdd = DefineDB();
         var table;
+        console.log(req.body.json);
         const values = [ExtractJSON(req.body.json,true),
                         ExtractJSON(req.body.json,false)];
         const rolepos = values[0].indexOf('role');
@@ -156,11 +195,29 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
         console.log(request);
         connection.query(request, function(err,rows){
             if(err) {res.json(ErrorJson(err));}
-            else {res.json({"Error" : false, "Message" : "User Added !"});}
+            else {
+                console.log(values[1][values[0].indexOf('coach')]);
+                if (values[1][values[0].indexOf('coach')])
+                {
+                    console.log("COACH");
+                    const query_rel = `INSERT INTO relations (coach, client) VALUES (?, ?)`;
+                    const requ_rel = DefineDB().format(query_rel,
+                                     [values[1][values[0].indexOf('coach')],
+                                      values[1][values[0].indexOf('email')]]);
+                    console.log(requ_rel);
+                    connection.query(requ_rel, function(err, rows) {
+                        if (err){res.json({"Error":true, "Message":err});}
+                        else{res.json({"Error":false});}
+                        });
+                    } else{
+                        console.log("USER");
+                        res.json({"Error" : false, "Message" : "User Added !"});}
+                    }
         });
-    });
-    
-    
+        console.log(values[0]);
+        });
+
+
     router.post("/connect", function(req, res){
         const bdd = DefineDB();
         const query = `SELECT * FROM users WHERE (email=? and password=?);`;
@@ -171,8 +228,30 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
             if (err){res.json(ErrorJson(err))} else {
                 const items = Object.keys(rows).length;
                 console.log(rows);
-                if (items >= 1){res.json({"Error": false,"role":rows[0].role})}
-                else{res.json({"Error": true, "Message": "No such user", "role":-1})}
+                if (items < 1){res.json({"Error": true, "Message": "No such user", "role":-1})}
+                else{
+                    var role = rows[0].role;
+                    if (role == 0) { // CLIENT ( + requete coach)
+                        const bdd = DefineDB();
+                        const query_coach = `SELECT * FROM relations WHERE (client=?);`;
+                        const request_coach = bdd.format(query_coach, values[1]);
+                        console.log("REQUEST COACH : " + request_coach);
+                        connection.query(request_coach, function(err, rows) {
+                            if (err){res.json({"Error": true, "Message":err})}
+                            else{
+                                console.log(rows);
+                                res.json({
+                                    "Error": false,
+                                    "Message": "OK",
+                                    "role":role,
+                                    "coach": rows.length > 0 ? rows[0].coach : "0"
+                                });
+                            }
+                        });
+                    } else { // COACH
+                        res.json({"Error": false, "Message": "OK", "role":role});
+                    }
+                }
             }
         });
     });
