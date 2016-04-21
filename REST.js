@@ -360,7 +360,7 @@ REST_ROUTER.prototype.handleRoutes = function(router,connection,md5) {
         });
     });
     
-    router.post("/print_planning", function(req, res) {
+    router.post("/print_planning", function(req, res){
         const bdd = DefineDB();
         const query = `SELECT * FROM planning WHERE (client=?);`;
         const values = [ExtractJSON(req.body.json, true),
@@ -368,12 +368,16 @@ REST_ROUTER.prototype.handleRoutes = function(router,connection,md5) {
         const request = bdd.format(query, values[1]);
         console.log(request);
         connection.query(request, function(err, rows){
-            if (err){res.json({"Error":true, "clients":-1})}
-            else{
+            if (err){
+                res.json({
+                    "Error":true,
+                    "clients":-1
+                });
+            } else{
                 var count = 0;
                 const size = rows.length;
                 const planning = {};
-                while (count < size) {
+                while (count < size){
                     var row_ = [
                         rows[count].date,
                         rows[count].heure,
@@ -387,9 +391,7 @@ REST_ROUTER.prototype.handleRoutes = function(router,connection,md5) {
             }
         });
     });
-    
     connection.release();
 };
-
 
 module.exports = REST_ROUTER;
