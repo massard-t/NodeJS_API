@@ -162,7 +162,7 @@ REST_ROUTER.prototype.handleRoutes = function(router,connection,md5) {
             res.json({
                 "Error":true,
                 "Message":err
-                });
+            });
             error = true;
         }
         console.log(values);
@@ -170,7 +170,7 @@ REST_ROUTER.prototype.handleRoutes = function(router,connection,md5) {
             res.json({
                 "Error":false,
                 "Message":"Ajout reponses ok"
-                });
+            });
         }
     });
     
@@ -183,22 +183,21 @@ REST_ROUTER.prototype.handleRoutes = function(router,connection,md5) {
         const rolepos = values[0].indexOf('role');
         if ((values[1][rolepos]) !== undefined){
             table = (parseInt((values[1][rolepos]).replace('\'', ''),
-                                                10) == 1) ? 'coach' : 'client';
+                        10) == 1) ? 'coach' : 'client';
             values[0].pop(rolepos);
             values[1].pop(rolepos);
-        } else {
+        } else{
             table = 'client';
         }
         const query = `INSERT INTO ${table} (??${table == 'client' ? ',new':''}) VALUES (?${table == 'client' ? ',0':''});`;
         const request = bdd.format(query, values);
         console.log(request);
         connection.query(request, function(err,rows){
-            if(err) {res.json(ErrorJson(err));}
-            else {
-                console.log(values[1][values[0].indexOf('coach')]);
-                if (values[1][values[0].indexOf('coach')])
-                {
-                    console.log("COACH");
+            if(err){
+                res.json(ErrorJson(err));
+            }
+            else{
+                if (values[1][values[0].indexOf('coach')]){
                     const query_rel = `INSERT INTO relations (coach, client) VALUES (?, ?)`;
                     const requ_rel = DefineDB().format(query_rel,
                                      [values[1][values[0].indexOf('coach')],
