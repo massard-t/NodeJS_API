@@ -279,7 +279,7 @@ REST_ROUTER.prototype.handleRoutes = function(router,connection,md5) {
         });
     });
     
-    router.post("/getmyclients", function(req, res) {
+    router.post("/getmyclients", function(req, res){
         const bdd = DefineDB();
         const query = `SELECT client FROM relations WHERE (coach=?);`;
         const values = [ExtractJSON(req.body.json, true),
@@ -287,13 +287,21 @@ REST_ROUTER.prototype.handleRoutes = function(router,connection,md5) {
         const request = bdd.format(query, values[1]);
         console.log(request);
         connection.query(request, function(err, rows){
-            if (err){res.json({"Error":true, "clients":-1})}
-            else{
+            if (err){
+                res.json({
+                    "Error":true,
+                    "clients":-1
+                });
+            } else{
                 var clients_id = [];
-                for (var row in rows) {
+                for (var row in rows){
                     clients_id.push(rows[row]);
                 }
-                res.json({"Error":false, "clients":clients_id})}
+                res.json({
+                    "Error":false,
+                    "clients":clients_id
+                });
+            }
         });
     });
     
