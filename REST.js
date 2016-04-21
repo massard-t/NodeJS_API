@@ -305,16 +305,20 @@ REST_ROUTER.prototype.handleRoutes = function(router,connection,md5) {
         });
     });
     
-    router.post("/getclientinfo", function(req, res) {
+    router.post("/getclientinfo", function(req, res){
         const bdd = DefineDB();
         const query = `SELECT * FROM client WHERE (email=?);`;
         const values = [ExtractJSON(req.body.json, true),
                         ExtractJSON(req.body.json, false)];
         const request = bdd.format(query, values[1]);
         console.log(request);
-        connection.query(request, function(err, rows) {
-            if (err){res.json({"Error":true})}
-            else{
+        connection.query(request, function(err, rows){
+            if (err){
+                res.json({
+                    "Error":true,
+                    "Message":"Something went wrong"
+                });
+            } else{
                 var client_info = [];
                 console.log(rows[0]);
                 const row = rows[0];
