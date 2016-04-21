@@ -346,8 +346,17 @@ REST_ROUTER.prototype.handleRoutes = function(router,connection,md5) {
         const request = bdd.format(query, values);
         console.log(request);
         connection.query(request, function(err, rows){
-            if (err){res.json({"Error":true, "Message":"Probleme interne"})}
-            else(res.json({"Error":false}));
+            if (err){
+                res.json({
+                    "Error":true,
+                    "Message":"Probleme interne"
+                });
+            } else{
+                res.json({
+                    "Error":false,
+                    "Message":"Success"
+                });
+            }
         });
     });
     
