@@ -50,17 +50,17 @@ function REST_ROUTER(router,connection,md5) {
     self.handleRoutes(router,connection,md5);
 }
 
-// function UserExists(content) {
-//     const bdd = DefineDB();
-//     const query = `SELECT id FROM client WHERE (email=?? AND ID=??);`;
-//     const values = [ExtractJSON(content,true),
-//                     ExtractJSON(content,false)];
-//     console.log(values[1]);
+function UserExists(content) {
+    const bdd = DefineDB();
+    const query = `SELECT id FROM client WHERE (email=?? AND ID=??);`;
+    const values = [ExtractJSON(content,true),
+                    ExtractJSON(content,false)];
+    console.log(values[1]);
     
-//     const request = bdd.format(query, values[1]);
-//     console.log(request);
-//     return;
-// }
+    const request = bdd.format(query, values[1]);
+    console.log(request);
+    return;
+}
 
 function ErrorJson(err)
 {
@@ -83,6 +83,29 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
         connection.query(request, function(err, rows){
             if (err){res.json({"Error":true, "Message":"Probleme interne"})}
             else {res.json({"Error":false, "Message":"Nouvelle relation"})}
+        });
+    });
+    
+    
+    router.post("/info_coach", function(req, res){
+        const bdd = DefineDB();
+        const values = [ExtractJSON(req.body.json, true),
+                        ExtractJSON(req.body.json, false)];
+        var nb_clients;
+        const query_clients = `SELECT * FROM relations WHERE (coach=?);`;
+        const req_clients = bdd.format(query_clients, values[1]);
+        console.log(req_clients);
+        connection.query(req_clients, function(err, rows) {
+            if (err){res.json({"Error":true, "Message":err});}
+            else{
+                nb_clients = rows.length;
+                const query_planning = `SELECT * FROM planning WHERE (coach=?);`;
+                const req_planning = bdd.format(query_planning, values[1]);
+                connection.query(req_planning, function(err, rows) {
+                    if (err){res.json({"Error":true, "Message":err})}
+                   else{res.json({"clients":nb_clients, "seances":rows.length})}
+            });
+            }
         });
     });
     
@@ -128,7 +151,7 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
         } else {
             table = 'client';
         }
-        const query = `INSERT INTO ${table} (??, new) VALUES (?, 0);`;
+        const query = `INSERT INTO ${table} (??${table == 'client' ? ',new':''}) VALUES (?${table == 'client' ? ',0':''});`;
         const request = bdd.format(query, values);
         console.log(request);
         connection.query(request, function(err,rows){
@@ -136,6 +159,7 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
             else {res.json({"Error" : false, "Message" : "User Added !"});}
         });
     });
+    
     
     router.post("/connect", function(req, res){
         const bdd = DefineDB();
@@ -221,10 +245,10 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
                 const planning = {};
                 while (count < size) {
                     var row_ = [
-                        rows[count].date.substr(1, (rows[count].date.length)- 1),
-                        rows[count].heure.substr(1, (rows[count].heure.length)- 1),
-                        rows[count].temps.substr(1, (rows[count].temps.length)- 1),
-                        rows[count].coach.substr(1, (rows[count].coach.length)- 1)
+                        rows[count].date,
+                        rows[count].heure,
+                        rows[count].temps,
+                        rows[count].coach
                     ];
                     planning[count] = row_;
                     count++;
