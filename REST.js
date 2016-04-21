@@ -253,9 +253,12 @@ REST_ROUTER.prototype.handleRoutes = function(router,connection,md5) {
                         const request_coach = bdd.format(query_coach, values[1]);
                         console.log("REQUEST COACH : " + request_coach);
                         connection.query(request_coach, function(err, rows) {
-                            if (err){res.json({"Error": true, "Message":err})}
-                            else{
-                                console.log(rows);
+                            if (err){
+                                res.json({
+                                    "Error": true,
+                                    "Message":err
+                                });
+                            } else{
                                 res.json({
                                     "Error": false,
                                     "Message": "OK",
@@ -265,7 +268,11 @@ REST_ROUTER.prototype.handleRoutes = function(router,connection,md5) {
                             }
                         });
                     } else { // COACH
-                        res.json({"Error": false, "Message": "OK", "role":role});
+                        res.json({
+                            "Error": false,
+                            "Message": "OK",
+                            "role":role
+                        });
                     }
                 }
             }
