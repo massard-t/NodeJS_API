@@ -221,10 +221,10 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection,md5) {
                 const planning = {};
                 while (count < size) {
                     var row_ = [
-                        rows[count].date,
-                        rows[count].heure,
-                        rows[count].temps,
-                        rows[count].coach
+                        rows[count].date.substr(1, (rows[count].date.length)- 1),
+                        rows[count].heure.substr(1, (rows[count].heure.length)- 1),
+                        rows[count].temps.substr(1, (rows[count].temps.length)- 1),
+                        rows[count].coach.substr(1, (rows[count].coach.length)- 1)
                     ];
                     planning[count] = row_;
                     count++;
