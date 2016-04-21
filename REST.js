@@ -235,11 +235,17 @@ REST_ROUTER.prototype.handleRoutes = function(router,connection,md5) {
                         ExtractJSON(req.body.json,false)];
         const request = bdd.format(query, values[1]);
         connection.query(request, function(err, rows){
-            if (err){res.json(ErrorJson(err))} else {
+            if (err){
+                res.json(ErrorJson(err));
+            } else{
                 const items = Object.keys(rows).length;
-                console.log(rows);
-                if (items < 1){res.json({"Error": true, "Message": "No such user", "role":-1})}
-                else{
+                if (items < 1){
+                    res.json({
+                        "Error": true,
+                        "Message": "No such user",
+                        "role":-1
+                    });
+                } else{
                     var role = rows[0].role;
                     if (role == 0) { // CLIENT ( + requete coach)
                         const bdd = DefineDB();
