@@ -5,7 +5,6 @@ var md5 = require('md5');
 var rest = require("./REST.js");
 var app = express();
 
-// app.use(express.bodyParser());
 
 function REST() {
     const self = this;

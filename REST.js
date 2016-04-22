@@ -44,7 +44,7 @@ function Foreach_Add(js_obj, query) {
     console.log(request);
     bdd.query(request, function(err, rows) {
         if (err){
-            throw err;
+            console.log(err);
         }
         else {
             console.log("Not a single error");
@@ -384,7 +384,7 @@ REST_ROUTER.prototype.handleRoutes = function(router,connection,md5) {
                         rows[count].date,
                         rows[count].heure,
                         rows[count].temps,
-                        rows[count].coach
+                        rows[count].client
                     ];
                     planning[count] = row_;
                     count++;
