@@ -1,12 +1,11 @@
 var mysql = require("mysql");
 var query = `INSERT INTO question (numero, intitule) VALUES (?, ?);`;
-const question = {"email": "sulli@theo.com", "1": "vacation", "2": "pipi", "3": "jdtyjdtyj", "4": "", "5": "hfhfghfghfghfghfghfgh"};
+const question = {"email": "sulli@theo.com", "1": "vacation", "2": "test", "3": "test3", "4": "", "5": "something"};
 
 function TransformJSONarrayBi(js_obj, fields) {
-    // console.log(js_obj)
+    console.log(js_obj)
     const parsed_data = js_obj;
-    // const parsed_data = JSON.parse(js_obj);
-    // console.log("DE" + parsed_data + "FI");
+    console.log("DE" + parsed_data + "FI");
     if (parsed_data === 'undefined')
         return (false);
     var res_final = [];
