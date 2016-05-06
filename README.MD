@@ -1,5 +1,5 @@
-# Code Camp iOS
-Simple REST API made in node.js to ensure connexions between a database and an iOS app.
+# NodeJS_API
+Simple REST API made in node.js to ensure connexions between a database and a client.
 
 ## Routes
 Below are listed the different routes, used with POST data.
